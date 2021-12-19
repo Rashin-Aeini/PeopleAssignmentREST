@@ -1,15 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PeopleAssignmentREST.Models.Data;
+using PeopleAssignmentREST.Models.Repos;
+using PeopleAssignmentREST.Models.Services;
 
 namespace PeopleAssignmentREST
 {
@@ -20,11 +17,32 @@ namespace PeopleAssignmentREST
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<PeopleContext>(
+                options => options.UseSqlServer(
+                    Configuration.GetConnectionString("Default")
+                    )
+            );
+
+            services.AddScoped<IPeopleRepo, DatabasePeopleRepo>();
+
+            services.AddScoped<IPeopleService, PeopleService>();
+
+            services.AddScoped<ICountryRepo, DatabaseCountryRepo>();
+
+            services.AddScoped<ICountryService, CountryService>();
+
+            services.AddScoped<ICityRepo, DatabaseCityRepo>();
+
+            services.AddScoped<ICityService, CityService>();
+
+            services.AddScoped<ILanguageRepo, DatabaseLanguageRepo>();
+
+            services.AddScoped<ILanguageService, LanguageService>();
 
             services.AddControllers();
         }
